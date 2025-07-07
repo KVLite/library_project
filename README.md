@@ -176,15 +176,18 @@ ORDER BY 2;
 
 ```sql
 CREATE TABLE book_issued_cnt AS
-SELECT b.isbn, b.book_title, COUNT(ist.issued_id) AS issue_count
-FROM issued_status as ist
-JOIN books as b
-ON ist.issued_book_isbn = b.isbn
+    SELECT
+        b.isbn,
+        b.book_title,
+        COUNT(ist.issued_id) AS issue_count
+    FROM issued_status as ist
+    JOIN books as b
+        ON ist.issued_book_isbn = b.isbn
 GROUP BY b.isbn, b.book_title;
 ```
 
 
-### 4. Data Analysis & Findings
+### D. Data Analysis & Findings
 
 The following SQL queries were used to address specific questions:
 
@@ -200,14 +203,15 @@ WHERE category = 'Classic';
 ```sql
 SELECT 
     b.category,
-    SUM(b.rental_price),
+    SUM(b.rental_price) AS rental_income,
     COUNT(*)
 FROM 
 issued_status as ist
 JOIN
 books as b
-ON b.isbn = ist.issued_book_isbn
+    ON b.isbn = ist.issued_book_isbn
 GROUP BY 1
+ORDER BY 2 DESC;
 ```
 
 9. **List Members Who Registered in the Last 180 Days**:
@@ -222,24 +226,23 @@ WHERE reg_date >= CURRENT_DATE - INTERVAL '180 days';
 SELECT 
     e1.emp_id,
     e1.emp_name,
-    e1.position,
-    e1.salary,
-    b.*,
-    e2.emp_name as manager
+    b.branch_id,
+	b.manager_id,
+	e2.emp_name as manager
 FROM employees as e1
 JOIN 
 branch as b
-ON e1.branch_id = b.branch_id    
+    ON e1.branch_id = b.branch_id    
 JOIN
 employees as e2
-ON e2.emp_id = b.manager_id
+    ON e2.emp_id = b.manager_id
 ```
 
 Task 11. **Create a Table of Books with Rental Price Above a Certain Threshold**:
 ```sql
 CREATE TABLE expensive_books AS
-SELECT * FROM books
-WHERE rental_price > 7.00;
+    SELECT * FROM books
+    WHERE rental_price > 7.00;
 ```
 
 Task 12: **Retrieve the List of Books Not Yet Returned**
