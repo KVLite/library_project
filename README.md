@@ -235,7 +235,7 @@ branch as b
     ON e1.branch_id = b.branch_id    
 JOIN
 employees as e2
-    ON e2.emp_id = b.manager_id
+    ON e2.emp_id = b.manager_id;
 ```
 
 Task 11. **Create a Table of Books with Rental Price Above a Certain Threshold**:
@@ -256,6 +256,7 @@ WHERE rs.return_id IS NULL;
 
 ## Advanced SQL Operations
 
+```sql
 INSERT INTO issued_status(issued_id, issued_member_id, issued_book_name, issued_date, issued_book_isbn, issued_emp_id)
 VALUES
 ('IS151', 'C118', 'The Catcher in the Rye', CURRENT_DATE - INTERVAL '24 days',  '978-0-553-29698-2', 'E108'),
@@ -272,7 +273,7 @@ UPDATE return_status
 SET book_quality = 'Damaged'
 WHERE issued_id 
     IN ('IS112', 'IS117', 'IS118');
-
+```
 
 **Task 13: Identify Members with Overdue Books**  
 Write a query to identify members who have overdue books (assume a 30-day return period). Display the member's_id, member's name, book title, issue date, and days overdue.
@@ -416,29 +417,31 @@ AS
 SELECT 
     b.branch_id,
     b.manager_id,
-    COUNT(ist.issued_id) as number_book_issued,
-    COUNT(rs.return_id) as number_of_book_return,
+	b.branch_address,
+    COUNT(ist.issued_id) as number_of_books_issued,
+    COUNT(rs.return_id) as number_of_books_returned,
     SUM(bk.rental_price) as total_revenue
 FROM issued_status as ist
 JOIN 
-employees as e
-ON e.emp_id = ist.issued_emp_id
+employees as emp
+	ON emp.emp_id = ist.issued_emp_id
 JOIN
 branch as b
-ON e.branch_id = b.branch_id
+	ON emp.branch_id = b.branch_id
 LEFT JOIN
-return_status as rs
-ON rs.issued_id = ist.issued_id
+return_status as rst
+	ON rst.issued_id = ist.issued_id
 JOIN 
 books as bk
-ON ist.issued_book_isbn = bk.isbn
-GROUP BY 1, 2;
+	ON ist.issued_book_isbn = bk.isbn
+GROUP BY 1, 2
+ORDER BY 6 DESC;
 
 SELECT * FROM branch_reports;
 ```
 
 **Task 16: CTAS: Create a Table of Active Members**  
-Use the CREATE TABLE AS (CTAS) statement to create a new table active_members containing members who have issued at least one book in the last 2 months.
+Use the CREATE TABLE AS (CTAS) statement to create a new table active_members containing members who have issued at least one book in the last 6 months.
 
 ```sql
 
@@ -449,7 +452,7 @@ WHERE member_id IN (SELECT
                         DISTINCT issued_member_id   
                     FROM issued_status
                     WHERE 
-                        issued_date >= CURRENT_DATE - INTERVAL '2 month'
+                        issued_date >= CURRENT_DATE - INTERVAL '6 month'
                     )
 ;
 
@@ -464,21 +467,42 @@ Write a query to find the top 3 employees who have processed the most book issue
 ```sql
 SELECT 
     e.emp_name,
-    b.*,
-    COUNT(ist.issued_id) as no_book_issued
+    COUNT(ist.issued_id) as total_books_issued,
+	b.branch_id
 FROM issued_status as ist
 JOIN
-employees as e
-ON e.emp_id = ist.issued_emp_id
+employees as emp
+	ON emp.emp_id = ist.issued_emp_id
 JOIN
 branch as b
-ON e.branch_id = b.branch_id
+	ON emp.branch_id = b.branch_id
 GROUP BY 1, 2
+ORDER BY 3 DESC;
 ```
 
 **Task 18: Identify Members Issuing High-Risk Books**  
 Write a query to identify members who have issued books more than twice with the status "damaged" in the books table. Display the member name, book title, and the number of times they've issued damaged books.    
 
+```sql
+
+SELECT 
+	m.member_name,
+	bk.book_title,
+	COUNT(r.book_quality) AS total_damaged_books_issued
+FROM
+issued_status AS ist
+JOIN 
+members AS m
+	ON ist.issued_member_id = m.member_id
+JOIN
+return_status AS r
+	ON ist.issued_id = r.issued_id
+JOIN
+books AS bk
+	ON bk.isbn = ist.issued_book_isbn
+WHERE r.book_quality = 'Damaged'
+GROUP BY 1,2;
+```
 
 **Task 19: Stored Procedure**
 Objective:
@@ -492,13 +516,13 @@ If the book is not available (status = 'no'), the procedure should return an err
 
 ```sql
 
-CREATE OR REPLACE PROCEDURE issue_book(p_issued_id VARCHAR(10), p_issued_member_id VARCHAR(30), p_issued_book_isbn VARCHAR(30), p_issued_emp_id VARCHAR(10))
+CREATE OR REPLACE PROCEDURE issue_book(p_issued_id VARCHAR(10), p_issued_member_id VARCHAR(10), p_issued_book_isbn VARCHAR(25), p_issued_emp_id VARCHAR(10))
 LANGUAGE plpgsql
 AS $$
 
 DECLARE
 -- all the variabable
-    v_status VARCHAR(10);
+    v_status VARCHAR(15);
 
 BEGIN
 -- all the code
@@ -524,7 +548,7 @@ BEGIN
 
 
     ELSE
-        RAISE NOTICE 'Sorry to inform you the book you have requested is unavailable book_isbn: %', p_issued_book_isbn;
+        RAISE NOTICE 'The book you requested is currently unavailable. book_isbn: %', p_issued_book_isbn;
     END IF;
 END;
 $$
@@ -557,6 +581,32 @@ Description: Write a CTAS query to create a new table that lists each member and
     Number of overdue books
     Total fines
 
+```sql
+
+CREATE TABLE past_due_books
+AS
+SELECT 
+	m.member_id,
+	m.member_name,
+	COUNT(m.member_id) AS books_overdue,
+	SUM((CURRENT_DATE - (ist.issued_date + INTERVAL '30 days')::DATE) * 0.50) AS total_fines
+FROM
+	members AS m
+JOIN
+issued_status AS ist
+	ON m.member_id = ist.issued_member_id
+JOIN
+books AS b
+	ON b.isbn = ist.issued_book_isbn
+LEFT JOIN
+return_status AS ret
+	ON ist.issued_id = ret.issued_id
+WHERE return_date IS NULL
+	AND CURRENT_DATE - (ist.issued_date + INTERVAL '30 Days')::DATE > 0
+GROUP BY 1,2;
+
+SELECT * FROM past_due_books;
+```
 
 
 ## Reports
@@ -569,24 +619,13 @@ Description: Write a CTAS query to create a new table that lists each member and
 
 This project demonstrates the application of SQL skills in creating and managing a library management system. It includes database setup, data manipulation, and advanced querying, providing a solid foundation for data management and analysis.
 
-## How to Use
 
-1. **Clone the Repository**: Clone this repository to your local machine.
-   ```sh
-   git clone https://github.com/najirh/Library-System-Management---P2.git
-   ```
 
-2. **Set Up the Database**: Execute the SQL scripts in the `database_setup.sql` file to create and populate the database.
-3. **Run the Queries**: Use the SQL queries in the `analysis_queries.sql` file to perform the analysis.
-4. **Explore and Modify**: Customize the queries as needed to explore different aspects of the data or answer additional questions.
-
-## Author - Zero Analyst
+## Author - Kelle Vaughn
 
 This project showcases SQL skills essential for database management and analysis. For more content on SQL and data analysis, connect with me through the following channels:
 
-- **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@zero_analyst)
-- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/zero_analyst/)
-- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/najirr)
-- **Discord**: [Join our community for learning and collaboration](https://discord.gg/36h5f2Z5PK)
+- **LinkedIn**: [Connect with me professionally](www.linkedin.com/in/kellevaughn-pmp)
 
-Thank you for your interest in this project!
+
+Thank you for your interest!
