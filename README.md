@@ -250,11 +250,29 @@ Task 12: **Retrieve the List of Books Not Yet Returned**
 SELECT * FROM issued_status as ist
 LEFT JOIN
 return_status as rs
-ON rs.issued_id = ist.issued_id
+	ON rs.issued_id = ist.issued_id
 WHERE rs.return_id IS NULL;
 ```
 
 ## Advanced SQL Operations
+
+INSERT INTO issued_status(issued_id, issued_member_id, issued_book_name, issued_date, issued_book_isbn, issued_emp_id)
+VALUES
+('IS151', 'C118', 'The Catcher in the Rye', CURRENT_DATE - INTERVAL '24 days',  '978-0-553-29698-2', 'E108'),
+('IS152', 'C119', 'The Catcher in the Rye', CURRENT_DATE - INTERVAL '13 days',  '978-0-553-29698-2', 'E109'),
+('IS153', 'C106', 'Pride and Prejudice', CURRENT_DATE - INTERVAL '7 days',  '978-0-14-143951-8', 'E107'),
+('IS154', 'C105', 'The Road', CURRENT_DATE - INTERVAL '32 days',  '978-0-375-50167-0', 'E101');
+
+-- Adding new column in return_status
+
+ALTER TABLE return_status
+ADD Column book_quality VARCHAR(15) DEFAULT('Good');
+
+UPDATE return_status
+SET book_quality = 'Damaged'
+WHERE issued_id 
+    IN ('IS112', 'IS117', 'IS118');
+
 
 **Task 13: Identify Members with Overdue Books**  
 Write a query to identify members who have overdue books (assume a 30-day return period). Display the member's_id, member's name, book title, issue date, and days overdue.
@@ -263,7 +281,7 @@ Write a query to identify members who have overdue books (assume a 30-day return
 SELECT 
     ist.issued_member_id,
     m.member_name,
-    bk.book_title,
+    b.book_title,
     ist.issued_date,
     -- rs.return_date,
     CURRENT_DATE - ist.issued_date as over_dues_days
@@ -272,24 +290,52 @@ JOIN
 members as m
     ON m.member_id = ist.issued_member_id
 JOIN 
-books as bk
-ON bk.isbn = ist.issued_book_isbn
+books as b
+ON b.isbn = ist.issued_book_isbn
 LEFT JOIN 
 return_status as rs
-ON rs.issued_id = ist.issued_id
+	ON rs.issued_id = ist.issued_id
 WHERE 
     rs.return_date IS NULL
     AND
     (CURRENT_DATE - ist.issued_date) > 30
-ORDER BY 1
+ORDER BY 1;
 ```
 
 
 **Task 14: Update Book Status on Return**  
 Write a query to update the status of books in the books table to "Yes" when they are returned (based on entries in the return_status table).
-
-
 ```sql
+--1st the manual updates
+
+SELECT * FROM books
+WHERE isbn = '978-0-451-52994-2';
+
+UPDATE books
+SET status = 'no'
+WHERE isbn = '978-0-451-52994-2'
+
+SELECT * FROM  issued_status
+WHERE issued_book_isbn = '978-0-451-52994-2';
+
+SELECT * FROM  return_status
+WHERE issued_id = 'IS130';  -- not returned
+
+INSERT INTO return_status(return_id, issued_id, return_date, book_quality)
+VALUES
+('RS125', 'IS130', 'CURRENT_DATE' 'Good');
+
+SELECT * FROM return_status
+WHERE issued_id ='IS130';
+
+UPDATE books
+SET status = 'yes'
+WHERE isbn = '978-0-451-52994-2'
+
+SELECT * FROM books
+Where isbn = '978-0-451-52994-2';
+
+-- Automated update procedure
 
 CREATE OR REPLACE PROCEDURE add_return_records(p_return_id VARCHAR(10), p_issued_id VARCHAR(10), p_book_quality VARCHAR(10))
 LANGUAGE plpgsql
@@ -300,7 +346,7 @@ DECLARE
     v_book_name VARCHAR(80);
     
 BEGIN
-    -- all your logic and code
+    -- all logic and code
     -- inserting into returns based on users input
     INSERT INTO return_status(return_id, issued_id, return_date, book_quality)
     VALUES
@@ -327,17 +373,28 @@ $$
 
 -- Testing FUNCTION add_return_records
 
+SELECT * FROM  books
+WHERE status = 'no';  -- example, isbn 978-0-307-58837-1, issued_id IS13
+
 issued_id = IS135
 ISBN = WHERE isbn = '978-0-307-58837-1'
 
 SELECT * FROM books
-WHERE isbn = '978-0-307-58837-1';
+WHERE isbn = '978-0-307-58837-1'; 
 
 SELECT * FROM issued_status
 WHERE issued_book_isbn = '978-0-307-58837-1';
 
 SELECT * FROM return_status
 WHERE issued_id = 'IS135';
+
+SELECT * FROM return_status
+
+DELETE FROM return_status
+WHERE issued_id = 'IS135';
+
+DELETE FROM return_status
+WHERE issued_id = 'IS140';
 
 -- calling function 
 CALL add_return_records('RS138', 'IS135', 'Good');
