@@ -1,4 +1,4 @@
-# Library Management System using SQL Project --P2
+# Library Management System using SQL 
 
 ## Project Overview
 
@@ -105,9 +105,19 @@ CREATE TABLE return_status
             FOREIGN KEY (issued_id) REFERENCES issued_status(issued_id)
     );
 
+--A. Check all Data Uploads
+
+SELECT * FROM books;
+SELECT * FROM branch;
+SELECT * FROM employees;
+SELECT * FROM issued_status;
+SELECT * FROM members;
+SELECT * FROM return_status;
+
+
 ```
 
-### 2. CRUD Operations
+### B. CRUD Operations (Create, Read, Update, Delete)
 
 - **Create**: Inserted sample records into the `books` table.
 - **Read**: Retrieved and displayed data from various tables.
@@ -120,6 +130,7 @@ CREATE TABLE return_status
 ```sql
 INSERT INTO books(isbn, book_title, category, rental_price, status, author, publisher)
 VALUES('978-1-60129-456-2', 'To Kill a Mockingbird', 'Classic', 6.00, 'yes', 'Harper Lee', 'J.B. Lippincott & Co.');
+
 SELECT * FROM books;
 ```
 **Task 2: Update an Existing Member's Address**
@@ -142,7 +153,7 @@ WHERE   issued_id =   'IS121';
 -- Objective: Select all books issued by the employee with emp_id = 'E101'.
 ```sql
 SELECT * FROM issued_status
-WHERE issued_emp_id = 'E101'
+WHERE issued_emp_id = 'E101';
 ```
 
 
@@ -156,9 +167,10 @@ SELECT
 FROM issued_status
 GROUP BY 1
 HAVING COUNT(*) > 1
+ORDER BY 2;
 ```
 
-### 3. CTAS (Create Table As Select)
+### C. CTAS (Create Table As Select)
 
 - **Task 6: Create Summary Tables**: Used CTAS to generate new tables based on query results - each book and total book_issued_cnt**
 
