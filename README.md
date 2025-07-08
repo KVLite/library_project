@@ -172,7 +172,7 @@ ORDER BY 2;
 
 ### C. CTAS (Create Table As Select)
 
-- **Task 6: Create Summary Tables**: Used CTAS to generate new tables based on query results - each book and total book_issued_cnt**
+**Task 6: Create Summary Tables**: Used CTAS to generate new tables based on query results - each book and total book_issued_cnt**
 
 ```sql
 CREATE TABLE book_issued_cnt AS
@@ -191,14 +191,14 @@ GROUP BY b.isbn, b.book_title;
 
 The following SQL queries were used to address specific questions:
 
-7. **Task 7: Retrieve All Books in a Specific Category**:
+**Task 7: Retrieve All Books in a Specific Category**:
 
 ```sql
 SELECT * FROM books
 WHERE category = 'Classic';
 ```
 
-8. **Task 8: Find Total Rental Income by Category**:
+**Task 8: Find Total Rental Income by Category**:
 
 ```sql
 SELECT 
@@ -214,13 +214,13 @@ GROUP BY 1
 ORDER BY 2 DESC;
 ```
 
-9. **List Members Who Registered in the Last 180 Days**:
+**Task 9: List Members Who Registered in the Last 180 Days**:
 ```sql
 SELECT * FROM members
 WHERE reg_date >= CURRENT_DATE - INTERVAL '180 days';
 ```
 
-10. **List Employees with Their Branch Manager's Name and their branch details**:
+**Task 10: List Employees with Their Branch Manager's Name and their branch details**:
 
 ```sql
 SELECT 
@@ -238,14 +238,14 @@ employees as e2
     ON e2.emp_id = b.manager_id;
 ```
 
-Task 11. **Create a Table of Books with Rental Price Above a Certain Threshold**:
+**Task 11: Create a Table of Books with Rental Price Above a Certain Threshold**:
 ```sql
 CREATE TABLE expensive_books AS
     SELECT * FROM books
     WHERE rental_price > 7.00;
 ```
 
-Task 12: **Retrieve the List of Books Not Yet Returned**
+**Task 12: Retrieve the List of Books Not Yet Returned**
 ```sql
 SELECT * FROM issued_status as ist
 LEFT JOIN
@@ -307,34 +307,6 @@ ORDER BY 1;
 **Task 14: Update Book Status on Return**  
 Write a query to update the status of books in the books table to "Yes" when they are returned (based on entries in the return_status table).
 ```sql
---1st the manual updates
-
-SELECT * FROM books
-WHERE isbn = '978-0-451-52994-2';
-
-UPDATE books
-SET status = 'no'
-WHERE isbn = '978-0-451-52994-2'
-
-SELECT * FROM  issued_status
-WHERE issued_book_isbn = '978-0-451-52994-2';
-
-SELECT * FROM  return_status
-WHERE issued_id = 'IS130';  -- not returned
-
-INSERT INTO return_status(return_id, issued_id, return_date, book_quality)
-VALUES
-('RS125', 'IS130', 'CURRENT_DATE' 'Good');
-
-SELECT * FROM return_status
-WHERE issued_id ='IS130';
-
-UPDATE books
-SET status = 'yes'
-WHERE isbn = '978-0-451-52994-2'
-
-SELECT * FROM books
-Where isbn = '978-0-451-52994-2';
 
 -- Automated update procedure
 
@@ -404,8 +376,6 @@ CALL add_return_records('RS138', 'IS135', 'Good');
 CALL add_return_records('RS148', 'IS140', 'Good');
 
 ```
-
-
 
 
 **Task 15: Branch Performance Report**  
@@ -617,13 +587,11 @@ SELECT * FROM past_due_books;
 
 ## Conclusion
 
-This project demonstrates the application of SQL skills in creating and managing a library management system. It includes database setup, data manipulation, and advanced querying, providing a solid foundation for data management and analysis.
+This project demonstrates the use of SQL in creating and managing a library management system. It includes database setup, data manipulation, and advanced querying, providing a solid foundation for data management and analysis.
 
 
 
 ## Author - Kelle Vaughn
-
-This project showcases SQL skills essential for database management and analysis. For more content on SQL and data analysis, connect with me through the following channels:
 
 - **LinkedIn**: [Connect with me professionally](www.linkedin.com/in/kellevaughn-pmp)
 
