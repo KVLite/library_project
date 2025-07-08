@@ -7,7 +7,7 @@
 
 Implement a Library Management System using SQL. Create and manage tables, perform CRUD operations, and execute some advanced SQL queries. The goal is to showcase skills in database design, manipulation, and querying.
 
-![Library ERD](https://github.com/KVLite/library_project/blob/main/library_erd.png)
+![Library Image](https://github.com/KVLite/library_project/blob/main/library_erd.png)
 
 ## Objectives
 
@@ -19,7 +19,7 @@ Implement a Library Management System using SQL. Create and manage tables, perfo
 ## Project Structure
 
 ### A. Database Setup
-![ERD](https://github.com/KVLite/library_project)
+![Library ERD](https://github.com/KVLite/library_project/blob/main/library_erd.png)
 
 - **Database Creation**: Created a database named `library_project`.
 - **Table Creation**: Created tables for branches, employees, members, books, issued status, and return status. Each table includes relevant columns and relationships.
