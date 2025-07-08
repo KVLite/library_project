@@ -308,7 +308,7 @@ ORDER BY 1;
 Write a query to update the status of books in the books table to "Yes" when they are returned (based on entries in the return_status table).
 ```sql
 
--- Automated update procedure
+-- Update procedure
 
 CREATE OR REPLACE PROCEDURE add_return_records(p_return_id VARCHAR(10), p_issued_id VARCHAR(10), p_book_quality VARCHAR(10))
 LANGUAGE plpgsql
@@ -344,7 +344,7 @@ END;
 $$
 
 
--- Testing FUNCTION add_return_records
+-- Testing Procedure add_return_records
 
 SELECT * FROM  books
 WHERE status = 'no';  -- example, isbn 978-0-307-58837-1, issued_id IS13
@@ -369,10 +369,10 @@ WHERE issued_id = 'IS135';
 DELETE FROM return_status
 WHERE issued_id = 'IS140';
 
--- calling function 
+-- Calling the Procedure 
 CALL add_return_records('RS138', 'IS135', 'Good');
 
--- calling function 
+-- Calling the Procedure  
 CALL add_return_records('RS148', 'IS140', 'Good');
 
 ```
@@ -523,7 +523,7 @@ BEGIN
 END;
 $$
 
--- Testing The function
+-- Testing the Procedure
 SELECT * FROM books;
 -- "978-0-553-29698-2" -- yes
 -- "978-0-375-41398-8" -- no
