@@ -7,7 +7,7 @@
 
 Implement a Library Management System using SQL. Create and manage tables, perform CRUD operations, and execute some advanced SQL queries. The goal is to showcase skills in database design, manipulation, and querying.
 
-![Library Image](https://github.com/KVLite/library_project/blob/main/Library%20Image.jpeg)
+![Library Image](https://github.com/KVLite/library_project/blob/main/library%20image%202.jpg)
 
 ## Objectives
 
