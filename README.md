@@ -18,7 +18,7 @@ Implement a Library Management System using SQL. Create and manage tables, perfo
 
 ## Project Structure
 
-### 1. Database Setup
+### A. Database Setup
 ![ERD](https://github.com/KVLite/library_project)
 
 - **Database Creation**: Created a database named `library_project`.
@@ -76,7 +76,7 @@ CREATE TABLE books
 
 
 
--- Create table "Issue_Status"
+-- Create table "Issued_Status"
 
 CREATE TABLE issued_status
     (
@@ -191,7 +191,7 @@ GROUP BY b.isbn, b.book_title;
 
 The following SQL queries were used to address specific questions:
 
-Task 7. **Retrieve All Books in a Specific Category**:
+7. **Task 7: Retrieve All Books in a Specific Category**:
 
 ```sql
 SELECT * FROM books
