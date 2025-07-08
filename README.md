@@ -593,6 +593,6 @@ This project demonstrates the use of SQL in creating and managing a library mana
 
 ## Author - Kelle Vaughn
 
-- **LinkedIn**: [Connect with me professionally](www.linkedin.com/in/kellevaughn-pmp)
+- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/kellevaughn-pmp)
 
 Thank you for your interest!
